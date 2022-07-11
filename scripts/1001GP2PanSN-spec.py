@@ -88,13 +88,12 @@ def add_haplo(data, deli):
 
 
 if __name__ == "__main__":
-    print("For proper working, the filename needs to be the sample_name. Alternatively add new sample name via flag.", file = sys.stderr)
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input", help="fasta file", required=True)
     parser.add_argument("-o", "--out", help="output file", required=True)
     parser.add_argument("-s", "--sample", help="If not set, take sample name")
     parser.add_argument("-d", "--delimiter", help="delimiter", default="#")
-    parser.add_argument("-c", "--chromosome", help="Take chromosome name from this index (sep by '_'", default = 1)
+    parser.add_argument("-c", "--chromosome", help="Take chromosome name from this index (sep by '_')", default = 1)
     parser.add_argument("-n", "--near", help = "Near perfect (only missing haplotype)", action="store_true")
     args = parser.parse_args()
 

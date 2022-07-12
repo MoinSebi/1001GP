@@ -10,7 +10,7 @@ import pandas as pd
 import argparse
 import sys
 
-def filter_syri(df1, name_ref, name_sample, snp):
+def add_features(df1, name_ref, name_sample, snp):
     """
     Read a merged syri data frame (without SNPs)
     Added columns:
@@ -28,8 +28,6 @@ def filter_syri(df1, name_ref, name_sample, snp):
     :return: Filtered data frame
     """
 
-    # Remove alignment
-    df = df1.loc[df1[10].apply(lambda x: x[-2:] != "AL")]
 
     # Change data type to int
     df[1] = df[1].astype(int)
@@ -37,17 +35,24 @@ def filter_syri(df1, name_ref, name_sample, snp):
     df[6] = df[6].astype(int)
     df[7] = df[7].astype(int)
 
-    # Remove SNPs
-    if snp:
-        df = df.loc[df[10] != "SNP"]
-
     # Add length of the sample and reference
     df["len_sample"] = df[7] - df[6]
     df["len_ref"] = df[2] - df[1]
     df["sample"] = name_sample
     df["ref"] = name_ref
     # Sort by length
+    return df
+
+def filter_size(df, size = 50):
     df = df.loc[(df["len_sample"] >= 50) | (df["len_ref"] >= 50)]
+    return df
+
+def filter_al(df1):
+    df = df1.loc[df1[10].apply(lambda x: x[-2:] != "AL")]
+    return df
+
+def filter_snps(df):
+    df = df.loc[df[10] != "SNP"]
     return df
 
 
@@ -69,13 +74,27 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input", help="fasta file", required=True)
     parser.add_argument("-o", "--out", help="output file")
-    parser.add_argument("-s", "--snp", help="remove SNPS", action="store_true", default=True)
+    parser.add_argument("-f", "--filter", help = "size filter [default 50bp]", default=50)
+    parser.add_argument("-a", "--al", help = "remove alignment [default on]", action="store_false", default=True)
+    parser.add_argument("-s", "--snp", help="remove SNPS [default on]", action="store_false", default=True)
     args = parser.parse_args()
 
+    # Read the DataFrame
     df = pd.read_csv(args.input, sep = "\t", header = None)
+
+
     name_ref = args.input.split("/")[-1].split("_")[0]
     name_sample = args.input.split("/")[-1].split("_")[1].split(".")[0]
-    df2 = filter_syri(df, name_ref, name_sample, args.snp)
+
+    if args.al:
+        df = filter_al(df)
+    if args.snp:
+        df = filter_snps(df)
+    df2 = add_features(df, name_ref, name_sample, args.snp)
+
+    if args.filter is not None:
+        df2 = filter_size(df2, int(args.filter))
+
     write_self(df2, args.out)
 
 

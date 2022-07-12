@@ -23,7 +23,7 @@ optional arguments:
 ```
 
 
-## syri_naming_filtering.py
+## syri_rename_filter.py
 Add additional features to the data frame. Possible filtering steps if wanted.  
 
 **Filtering**:  
@@ -31,12 +31,15 @@ Add additional features to the data frame. Possible filtering steps if wanted.
 - Size
 - Alignments 
 ```
-usage: syri_naming_filtering.py [-h] -i INPUT [-o OUT] [-s]
+usage: syri_rename_filter.py [-h] -i INPUT [-o OUT] [-f FILTER] [-a] [-s]
 
 optional arguments:
   -h, --help            show this help message and exit
   -i INPUT, --input INPUT
                         fasta file
   -o OUT, --out OUT     output file
-  -s, --snp             remove SNPS
+  -f FILTER, --filter FILTER
+                        size filter [default 50bp]
+  -a, --al              remove alignment [default on]
+  -s, --snp             remove SNPS [default on]
 ```

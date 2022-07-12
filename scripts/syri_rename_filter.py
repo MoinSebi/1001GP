@@ -56,7 +56,9 @@ def filter_snps(df):
     df = df.loc[df[10] != "SNP"]
     return df
 
-
+def filter_syn(df):
+    df = df.loc[df[10] != "SYN"]
+    return df
 def write_self(df, outname):
     """
     :param df: pandas DataFrame
@@ -78,6 +80,8 @@ if __name__ == "__main__":
     parser.add_argument("-f", "--filter", help = "size filter [default 50bp]", default=50)
     parser.add_argument("-a", "--al", help = "remove alignment [default on]", action="store_false", default=True)
     parser.add_argument("-s", "--snp", help="remove SNPS [default on]", action="store_false", default=True)
+    parser.add_argument("--syn", help="remove syntenic regions [default on]", action="store_false", default=True)
+
     args = parser.parse_args()
 
     # Read the DataFrame
@@ -89,6 +93,8 @@ if __name__ == "__main__":
 
     if args.al:
         df = filter_al(df)
+    if args.syn:
+        df = filter_syn(df)
     if args.snp:
         df = filter_snps(df)
     df2 = add_features(df, name_ref, name_sample, args.snp)

@@ -3,8 +3,9 @@
 """
 Created on 2022-07-11
 
-@author: moinSebi
-
+Comment:
+Run for all files with and safe everything in one file:
+parallel .syri_naming_filtering.py -i $1 > sum.txt ::: /ebio/abt6_projects8/1001g_plus_scaffolding/data/syri/1_SyRI_ALLvsALL_v1-6/*/*.syri.ou
 """
 import pandas as pd
 import argparse

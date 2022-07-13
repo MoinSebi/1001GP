@@ -20,8 +20,8 @@ def read_bed(filename):
     with open(filename) as file:
         for line in file.readlines():
             ls = line.split()
-            mi = min(int(ls[1]), int(ls[2]))
-            ma = max(int(ls[1]), int(ls[2]))
+            mi = min(int(float(ls[1])), int(float(ls[2])))
+            ma = max(int(float(ls[1])), int(float(ls[2])))
             if ls[0] in data:
                 data[ls[0]].append((mi, ma, ma - mi))
             else:
@@ -59,11 +59,11 @@ def write(data, what, outname):
         with open(outname, "w") as fi:
             for key, value in data.items():
                 for x in value:
-                    print("\t".join([str(x1) for x1 in x]) + what2, file = fi)
+                    print(key + "\t" + "\t".join([str(x1) for x1 in x[:-1]]) + what2, file = fi)
     else:
         for key, value in data.items():
             for x in value:
-                print("\t".join([str(x1) for x1 in x]) + what2, file=sys.stdout)
+                print(key + "\t" + "\t".join([str(x1) for x1 in x[:-1]]) + what2, file=sys.stdout)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--size", help="Filter out everything smaller than this size", type=int)
     parser.add_argument("-o", "--out", help="output file")
     args = parser.parse_args()
-    what = [str(x) for x in parser.what.split(",")]
+    what = [str(x) for x in args.what.split(",")]
     bed = read_bed(args.input)
     if args.size is not None:
         bed = filter_min_size(bed, int(args.size))

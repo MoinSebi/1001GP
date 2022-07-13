@@ -43,10 +43,29 @@ def filter_min_size(data, minsize):
                 data2[key].append(x)
     return data2
 
+def splitting(data, outname, what, number = 10):
+    """
+    Splitting the output - wrapper around write function
+    :param data: bed data
+    :param outname: Name of the output file
+    :param what: see write function
+    :param number: number of entries in file
+    :return:
+    """
+    split = dict()
+    count = 0
+    for index, (key, value) in enumerate(data.items()):
+            if index % number == 0 and index != 0:
+                write(split, what, outname + "split" + str(count))
+                split = dict()
+                count += 1
+            split[key] = value
+    write(split, what, outname + "split" + str(count))
+
 
 def write(data, what, outname):
     """
-
+    Write file function
     :param data: Bed file content
     :param what: Columns to add
     :param outname: Name of the output file
@@ -70,10 +89,14 @@ if __name__ == "__main__":
     parser.add_argument("-i", "--input", help="BED file", required=True)
     parser.add_argument("-w", "--what", help="add these dummy columns (comma sep)")
     parser.add_argument("-s", "--size", help="Filter out everything smaller than this size", type=int)
+    parser.add_argument("--split", help = "Do you want to split the output", action="store_true")
     parser.add_argument("-o", "--out", help="output file")
     args = parser.parse_args()
     what = [str(x) for x in args.what.split(",")]
     bed = read_bed(args.input)
     if args.size is not None:
         bed = filter_min_size(bed, int(args.size))
-    write(bed, what, outname=args.out)
+    if args.split:
+        splitting(bed, args.out, what)
+    else:
+        write(bed, what, outname=args.out)

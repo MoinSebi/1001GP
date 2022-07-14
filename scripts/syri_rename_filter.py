@@ -11,7 +11,7 @@ import pandas as pd
 import argparse
 import sys
 
-def add_features(df1, name_ref, name_sample, snp):
+def add_features(df, name_ref, name_sample):
     """
     Read a merged syri data frame (without SNPs)
     Added columns:
@@ -25,7 +25,7 @@ def add_features(df1, name_ref, name_sample, snp):
         - Sample or reference length is bigger than 50 bp
 
 
-    :param df1: Data frame 1
+    :param df: Data frame 1
     :return: Filtered data frame
     """
 
@@ -45,7 +45,7 @@ def add_features(df1, name_ref, name_sample, snp):
     return df
 
 def filter_size(df, size = 50):
-    df = df.loc[(df["len_sample"] >= 50) | (df["len_ref"] >= 50)]
+    df = df.loc[(df["len_sample"] >= size) | (df["len_ref"] >= size)]
     return df
 
 def filter_al(df1):
@@ -59,6 +59,13 @@ def filter_snps(df):
 def filter_syn(df):
     df = df.loc[df[10] != "SYN"]
     return df
+
+
+def filter_hdr(df):
+    df = df.loc[df[10] != "HDR"]
+    return df
+
+
 def write_self(df, outname):
     """
     :param df: pandas DataFrame
@@ -81,6 +88,7 @@ if __name__ == "__main__":
     parser.add_argument("-a", "--al", help = "remove alignment [default on]", action="store_false", default=True)
     parser.add_argument("-s", "--snp", help="remove SNPS [default on]", action="store_false", default=True)
     parser.add_argument("--syn", help="remove syntenic regions [default on]", action="store_false", default=True)
+    parser.add_argument("--hdr", help = "remove HDR [default off]", action = "store_true")
 
     args = parser.parse_args()
 
@@ -95,11 +103,14 @@ if __name__ == "__main__":
         df = filter_al(df)
     if args.syn:
         df = filter_syn(df)
+    if args.hdr:
+        df = filter_hdr(df)
     if args.snp:
         df = filter_snps(df)
-    df2 = add_features(df, name_ref, name_sample, args.snp)
+    df2 = add_features(df, name_ref, name_sample)
 
     if args.filter is not None:
+        print("Filtering", file = sys.stderr)
         df2 = filter_size(df2, int(args.filter))
 
     write_self(df2, args.out)

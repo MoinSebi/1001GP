@@ -23,9 +23,9 @@ def read_bed(filename):
             mi = min(int(float(ls[1])), int(float(ls[2])))
             ma = max(int(float(ls[1])), int(float(ls[2])))
             if ls[0] in data:
-                data[ls[0]].append((mi, ma, ma - mi))
+                data[ls[0]].append([ma - mi, mi, ma]+ ls[3:])
             else:
-                data[ls[0]] = [(mi, ma, ma - mi)]
+                data[ls[0]] = [[ma - mi, mi, ma] + ls[3:]]
     return data
 
 def filter_min_size(data, minsize):
@@ -39,7 +39,7 @@ def filter_min_size(data, minsize):
     for key, value in data.items():
         data2[key] = []
         for x in value:
-            if x[2] >= minsize:
+            if x[0] >= minsize:
                 data2[key].append(x)
     return data2
 
@@ -78,24 +78,29 @@ def write(data, what, outname):
         with open(outname, "w") as fi:
             for key, value in data.items():
                 for x in value:
-                    print(key + "\t" + "\t".join([str(x1) for x1 in x[:-1]]) + what2, file = fi)
+                    print(key + "\t" + "\t".join([str(x1) for x1 in x[1:]]) + what2, file = fi)
     else:
         for key, value in data.items():
             for x in value:
-                print(key + "\t" + "\t".join([str(x1) for x1 in x[:-1]]) + what2, file=sys.stdout)
+                print(key + "\t" + "\t".join([str(x1) for x1 in x[1:]]) + what2, file=sys.stdout)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input", help="BED file", required=True)
     parser.add_argument("-w", "--what", help="add these dummy columns (comma sep)")
     parser.add_argument("-s", "--size", help="Filter out everything smaller than this size", type=int)
-    parser.add_argument("--split", help = "Do you want to split the output", action="store_true")
+    parser.add_argument("--split", help = "Do you want to split the output", action="store_true", default = False)
     parser.add_argument("-o", "--out", help="output file")
     args = parser.parse_args()
-    what = [str(x) for x in args.what.split(",")]
+    what = []
+    if args.what != None:
+        what = [str(x) for x in args.what.split(",")]
+    print("Reading BED file", file = sys.stderr)
     bed = read_bed(args.input)
     if args.size is not None:
+        print("Filter by size", file=sys.stderr)
         bed = filter_min_size(bed, int(args.size))
+    print("Writing output file", file=sys.stderr)
     if args.split:
         splitting(bed, args.out, what)
     else:

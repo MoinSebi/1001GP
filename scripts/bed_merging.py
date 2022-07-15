@@ -17,7 +17,7 @@ def read_bed(filename):
     :param typ: "g" = Graph; "a" = Anna; "s" = Syri
     :return:
     """
-    print("Reading the file")
+    print("Reading the file", file  = sys.stderr)
     data = dict()
     with open(filename) as file:
         for line in file.readlines():
@@ -35,16 +35,15 @@ def cluster(data: dict, dis = 10):
     :param dis: distance in clustering
     :return:
     """
-    print("Clustering: {}".format(len(data)))
+    print("Clustering: {}".format(len(data)), file  = sys.stderr)
     dataschmata = dict()
     for key, value in data.items():
-        print(key)
+        print(key, file  = sys.stderr)
+        print("Entries: ", str(len(value)), file  = sys.stderr)
         valu = [[x[0], x[1]] for x in value]
         y_pred = fcluster(linkage(np.array(valu)), dis, criterion='distance')
-        print("Entries: ", str(len(y_pred)))
         dd = cluster1(y_pred, valu)
-        print("Clusters", str(len(dd)))
-        print(key)
+        print("Clusters", str(len(dd)), file  = sys.stderr)
 
         okey = merge_typ(dd, value)
         dataschmata[key] = [test(dd, valu), okey]
@@ -97,16 +96,16 @@ def write_self(data, outname):
         with open(outname, "w") as fi:
             for key, value in data.items():
                 for key2, value2 in value[0].items():
-                    print("\t".join([str(key), str(value2[0]), str(value2[1]), str(value[key][key2])]), file = fi)
+                    print("\t".join([str(key), str(value2[0]), str(value2[1]), str(value[1][key2])]), file = fi)
     else:
         for key, value in data.items():
             for key2, value2 in value[0].items():
-                print("\t".join([str(key), str(value2[0]), str(value2[1]), str(value[key][key2])]), file=sys.stdout)
+                print("\t".join([str(key), str(value2[0]), str(value2[1]), str(value[1][key2])]), file=sys.stdout)
 
 
 
 if __name__ == "__main__":
-    print("All files in BED format.")
+    print("All files in BED format.", file = sys.stderr)
     parser = argparse.ArgumentParser()
     parser.add_argument("-g", "--graph", help="graph BED file", required=True)
     parser.add_argument("-o", "--output", help = "Output file name (can also be -)", required=True)
@@ -114,5 +113,5 @@ if __name__ == "__main__":
 
     bed_total = read_bed(args.graph)
     k = cluster(bed_total)
-    write_self(k, args.out)
+    write_self(k, args.output)
 

@@ -89,7 +89,7 @@ if __name__ == "__main__":
     parser.add_argument("-i", "--input", help="BED file", required=True)
     parser.add_argument("-w", "--what", help="add these dummy columns (comma sep)")
     parser.add_argument("-s", "--size", help="Filter out everything smaller than this size", type=int)
-    parser.add_argument("--split", help = "Do you want to split the output", action="store_true", default = False)
+    parser.add_argument("--split", help = "Split with THIS many entries per file", type=int)
     parser.add_argument("-o", "--out", help="output file")
     args = parser.parse_args()
     what = []
@@ -101,7 +101,7 @@ if __name__ == "__main__":
         print("Filter by size", file=sys.stderr)
         bed = filter_min_size(bed, int(args.size))
     print("Writing output file", file=sys.stderr)
-    if args.split:
-        splitting(bed, args.out, what)
+    if args.split is not None:
+        splitting(bed, args.out, what, args.split)
     else:
         write(bed, what, outname=args.out)

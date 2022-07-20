@@ -107,9 +107,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-i", "--input", help="graph BED file", required=True)
     parser.add_argument("-o", "--output", help = "Output file name (can also be -)", required=True)
+AA    parser.add_argument("-d", "--distance", help = "Distance of merge", type=int)
     args = parser.parse_args()
 
     bed_total = read_bed(args.input)
-    k = cluster(bed_total)
+    if args.distance is not None:
+        k = cluster(bed_total, int(args.distance))
+    else:
+        k = cluster(bed_total)
+
     write_self(k, args.output)
 

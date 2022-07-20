@@ -38,12 +38,11 @@ def cluster(data: dict, dis = 10):
     print("Clustering: {}".format(len(data)), file  = sys.stderr)
     dataschmata = dict()
     for key, value in data.items():
-        print(key, file  = sys.stderr)
-        print("Entries: ", str(len(value)), file  = sys.stderr)
-        valu = [[x[0], x[1]] for x in value]
-        y_pred = fcluster(linkage(np.array(valu)), dis, criterion='distance')
+        valu = [(x[0], x[1]) for x in value]
+        valu2 = np.array(list(set(valu)))
+        y_pred = fcluster(linkage(valu2), dis, criterion='distance')
         dd = cluster1(y_pred, valu)
-        print("Clusters", str(len(dd)), file  = sys.stderr)
+        print("Chr:Entries:RDup:Cluster\t", ":".join([key, str(len(value)),  str(len(valu2)),  str(len(dd))]), file  = sys.stderr)
 
         okey = merge_typ(dd, value)
         dataschmata[key] = [test(dd, valu), okey]
@@ -105,13 +104,12 @@ def write_self(data, outname):
 
 
 if __name__ == "__main__":
-    print("All files in BED format.", file = sys.stderr)
     parser = argparse.ArgumentParser()
-    parser.add_argument("-g", "--graph", help="graph BED file", required=True)
+    parser.add_argument("-i", "--input", help="graph BED file", required=True)
     parser.add_argument("-o", "--output", help = "Output file name (can also be -)", required=True)
     args = parser.parse_args()
 
-    bed_total = read_bed(args.graph)
+    bed_total = read_bed(args.input)
     k = cluster(bed_total)
     write_self(k, args.output)
 
